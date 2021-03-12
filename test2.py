@@ -6,29 +6,27 @@ from ortools.constraint_solver import pywrapcp
 import webbrowser
 import logging
 from datetime import datetime
-
+from getData import getCsvData
+from getData import getJsonData
 
 # limit time function
 # =========================================================
-import signal
-from contextlib import contextmanager
+# import signal
+# from contextlib import contextmanager
 
+# class TimeoutException(Exception): pass
 
-class TimeoutException(Exception): pass
-
-@contextmanager
-def time_limit(seconds):
-    def signal_handler(signum, frame):
-        raise TimeoutException("Timed out!")
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)
-
+# @contextmanager
+# def time_limit(seconds):
+#     def signal_handler(signum, frame):
+#         raise TimeoutException("Timed out!")
+#     signal.signal(signal.SIGALRM, signal_handler)
+#     signal.alarm(seconds)
+#     try:
+#         yield
+#     finally:
+#         signal.alarm(0)
 # =========================================================
-
 
 # Creat Random data orders
 # --------------------------------------------------------------------
@@ -48,9 +46,15 @@ print('Capacitie:(' + str(vehicle_capacities) + ' slot)')
 max_travel_distance = 20000
 print('Max travel distance:(' + str(max_travel_distance) + ' m)')
 
+# vehicle maximum travel distance
+vehicle_maximum_travel_distance = 30000  
+
+# maximum time per vehicle
+maximum_time_per_vehicle = 300000  
+
 # toa do ben xe
 # depot = [21.04232, 105.81245]
-depot = [43.7402,142.42785]
+depot = [35.0471975,135.7865344]
 
 # duong gioi han: tren - phai - duoi -trai
 # limitBor = [21.0416, 105.8562, 20.9907, 105.7465]
@@ -62,30 +66,43 @@ workingTime_end = 12
 workingTime = workingTime_end - workingTime_start
 
 #thoi gian di chuyen chenh lech
-time_deviation = 180
+time_deviation = 60
 
 #thoi gian cho(+-)
-wait_time = 30
+wait_time = 10
 
 # --------------------------------------------------------------------
 
-
+def solver_stt(status):
+    switcher = {
+        0: "ROUTING_NOT_SOLVED: Problem not solved yet",
+        1: "ROUTING_SUCCESS: Problem solved successfully",
+        2: "ROUTING_FAIL: No solution found to the problem",
+        3: "OUTING_FAIL_TIMEOUT: Time limit reached before finding a solution",
+        4: "ROUTING_NOT_SOLVED: Problem not solved yet"
+    }
+    return switcher.get(status)
 def creatematrixPoint(e,i,t):
     pointList = str(i[1]) + ',' + str(i[0])
-    latEnd = random.uniform(t[0], t[2])
-    lngEnd = random.uniform(t[1], t[3])
+    # latEnd = random.uniform(t[0], t[2])
+    # lngEnd = random.uniform(t[1], t[3])
+    latEnd = '35.0848179'
+    lngEnd = '135.7932127'
     pointList = pointList + ';' + str(lngEnd) + ',' + str(latEnd)
-    for x in range(e):
-        latStart = random.uniform(t[0], t[2])
-        lngStart = random.uniform(t[1], t[3])
-        # latEnd = random.uniform(t[0], t[2])
-        # lngEnd = random.uniform(t[1], t[3])
-        pointList = pointList + ';' + str(lngStart) + ',' + str(latStart)
+    # for x in range(e):
+    #     latStart = random.uniform(t[0], t[2])
+    #     lngStart = random.uniform(t[1], t[3])
+    #     # latEnd = random.uniform(t[0], t[2])
+    #     # lngEnd = random.uniform(t[1], t[3])
+    #     pointList = pointList + ';' + str(lngStart) + ',' + str(latStart)
         # print(' - ',(x + 1),': Start', str(lngStart) + ',' + str(latStart), ' End: ', str(lngEnd) + ',' + str(latEnd))
+    inputPoint = getCsvData(num_orders)
+    pointList = pointList + inputPoint
     return pointList
 def get_infoMatrix(e,start_time):
 
     data = e
+    # urlApi = "http://10.92.203.155/table/v1/driving/" + data + '?annotations=distance,duration'
     urlApi = "http://router.project-osrm.org/table/v1/driving/" + data + '?annotations=distance,duration'
     # urlApi = "http://10.92.200.89:5000/table/v1/driving/" + data + '?annotations=distance,duration'
     # print(urlApi)
@@ -121,7 +138,7 @@ def get_infoMatrix(e,start_time):
     print('--------------------')
     print('Time get data API:',"%s seconds" % round((time.time() - start_time),2))
     print('\n')
-    print('OR-tools is running...')
+    print('Input: ')
     return result
 def pickup_delivery(e):
     pickups_deliveries = []
@@ -147,7 +164,7 @@ def print_solution(data, manager, routing, assignment):
             time_var = time_dimension.CumulVar(index)
             node_index = manager.IndexToNode(index)
             route_load += data['demands'][node_index]
-            plan_output += '{0}L({1}),T({2},{3})->'.format(node_index, route_load, assignment.Min(time_var), assignment.Max(time_var))
+            plan_output += '[{0}]L({1}),T({2},{3})->'.format(node_index, route_load, assignment.Min(time_var), assignment.Max(time_var))
             previous_index = index
             index = assignment.Value(routing.NextVar(index))
             route_distance += routing.GetArcCostForVehicle(
@@ -162,20 +179,21 @@ def print_solution(data, manager, routing, assignment):
         plan_output += 'Distance of the route: {}m\n'.format(route_distance)
         # plan_output += 'Load of the route: {}\n'.format(route_load)
         plan_output += ('Time of the route: ' + str(int(time_route)) + ' s')
-        print('\n')
         print(arrTrip)
         print(plan_output)
+        print('\n')
         total_distance += route_distance
         total_load += route_load
         logging.info('   ---Trip ' + str(vehicle_id) + ':' + str(plan_output))
-    print('\n')
     print('Total distance of all routes: {}m'.format(total_distance))
     print('Total load of all routes: {}'.format(total_load))
     # return result
 def runOrTools(e,s,t,u,r,w,z,c,v):
+    
     # Time start OR-Tools
     start_or_time = time.time()
 
+    #======================================================================
     # create demand data
     demand = [0,0]
     for x in range(1, r + 1):
@@ -192,18 +210,26 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
     data = {}
     data['time_matrix'] = w
     data['distance_matrix'] = e
-    data['pickups_deliveries'] = s
+    # data['pickups_deliveries'] = s
     data['num_vehicles'] = t
-    data['depot'] = 0
+    # data['depot'] = 0
     data['demands'] = demand
     data['vehicle_capacities'] = capacities
     data['time_windows'] = c
+    data['starts'] = [0,0,0,0,0]
+    data['ends'] = [1,1,1,1,1]
     print(c)
-    print(s)
+    # print(s)
+    #======================================================================
+
+    print('\n')
+    print('Or-tool is running...')
+    print('\n')
 
     # Create the routing index manager.
     manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']),
-                                           data['num_vehicles'], data['depot'])
+                                           data['num_vehicles'],data['starts'],data['ends'])
+    # manager = pywrapcp.RoutingIndexManager(len(data['time_matrix']),data['num_vehicles'], data['depot'])
 
     # Create Routing Model.
     routing = pywrapcp.RoutingModel(manager)
@@ -215,8 +241,8 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
         from_node = manager.IndexToNode(from_index)
         to_node = manager.IndexToNode(to_index)
         return data['time_matrix'][from_node][to_node]
-
     transit_callback_index = routing.RegisterTransitCallback(time_callback)
+
     # Define cost of each arc.
     routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
 
@@ -225,7 +251,7 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
     routing.AddDimension(
         transit_callback_index,
         wait_time * 60,  # allow waiting time
-        300000000,  # maximum time per vehicle
+        maximum_time_per_vehicle,  # maximum time per vehicle
         False,  # Don't force start cumul to zero.
         timeW)
     time_dimension = routing.GetDimensionOrDie(timeW)
@@ -235,24 +261,40 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
     routing.AddDimension(
         transit_callback_index,
         0,  # no slack
-        300000,  # vehicle maximum travel distance
+        vehicle_maximum_travel_distance,  # vehicle maximum travel distance
         True,  # start cumul to zero
         dimension_name)
     distance_dimension = routing.GetDimensionOrDie(dimension_name)
-    distance_dimension.SetGlobalSpanCostCoefficient(10000)
-    # Sets a time limit of 10 seconds.
-    # solver.parameters.max_time_in_seconds = 10.0
+    distance_dimension.SetGlobalSpanCostCoefficient(1000)
+
+    # Add Capacity constraint.
+    def demand_callback(from_index):
+        """Returns the demand of the node."""
+        # Convert from routing variable Index to demands NodeIndex.
+        from_node = manager.IndexToNode(from_index)
+        return data['demands'][from_node]
+    demand_callback_index = routing.RegisterUnaryTransitCallback(
+        demand_callback)
+    routing.AddDimensionWithVehicleCapacity(
+        demand_callback_index,
+        0,  # null capacity slack
+        data['vehicle_capacities'],  # vehicle maximum capacities
+        True,  # start cumul to zero
+        'Capacity')
+
     # Add time window constraints for each location except depot.
     for location_idx, time_window in enumerate(data['time_windows']):
         if location_idx == 0:
             continue
         index = manager.NodeToIndex(location_idx)
         time_dimension.CumulVar(index).SetRange(time_window[0], time_window[1])
+
     # Add time window constraints for each vehicle start node.
     for vehicle_id in range(data['num_vehicles']):
         index = routing.Start(vehicle_id)
         time_dimension.CumulVar(index).SetRange(data['time_windows'][0][0],
                                                 data['time_windows'][0][1])
+
     # Instantiate route start and end times to produce feasible times.
     for i in range(data['num_vehicles']):
         routing.AddVariableMinimizedByFinalizer(
@@ -260,51 +302,17 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
         routing.AddVariableMinimizedByFinalizer(
             time_dimension.CumulVar(routing.End(i)))
 
-    # ----------------------------------------------------------------------------
-    # manager = pywrapcp.RoutingIndexManager(len(data['distance_matrix']),
-    #                                        data['num_vehicles'], data['depot'])
-
-    # # Create Routing Model.
-    # routing = pywrapcp.RoutingModel(manager)
-
-    # # Define cost of each arc.
-    # def distance_callback(from_index, to_index):
-    #     """Returns the manhattan distance between the two nodes."""
-    #     # Convert from routing variable Index to distance matrix NodeIndex.
-    #     from_node = manager.IndexToNode(from_index)
-    #     to_node = manager.IndexToNode(to_index)
-    #     return data['distance_matrix'][from_node][to_node]
-
-    # transit_callback_index = routing.RegisterTransitCallback(distance_callback)
-    # routing.SetArcCostEvaluatorOfAllVehicles(transit_callback_index)
-    # ----------------------------------------------------------------------------
-
-    # Add Capacity constraint.
-    # def demand_callback(from_index):
-    #     """Returns the demand of the node."""
-    #     # Convert from routing variable Index to demands NodeIndex.
-    #     from_node = manager.IndexToNode(from_index)
-    #     return data['demands'][from_node]
-
-    # demand_callback_index = routing.RegisterUnaryTransitCallback(
-    #     demand_callback)
-    # routing.AddDimensionWithVehicleCapacity(
-    #     demand_callback_index,
-    #     0,  # null capacity slack
-    #     data['vehicle_capacities'],  # vehicle maximum capacities
-    #     True,  # start cumul to zero
-    #     'Capacity')
-
-    # # Add Distance constraint.
-    # dimension_name = 'Distance'
-    # routing.AddDimension(
-    #     transit_callback_index,
-    #     0,  # no slack
-    #     u,  # vehicle maximum travel distance
-    #     True,  # start cumul to zero
-    #     dimension_name)
-    # distance_dimension = routing.GetDimensionOrDie(dimension_name)
-    # distance_dimension.SetGlobalSpanCostCoefficient(100)
+    # Define Transportation Requests.
+    # for request in data['pickups_deliveries']:
+    #     pickup_index = manager.NodeToIndex(request[0])
+    #     delivery_index = manager.NodeToIndex(request[1])
+    #     routing.AddPickupAndDelivery(pickup_index, delivery_index)
+    #     routing.solver().Add(
+    #         routing.VehicleVar(pickup_index) == routing.VehicleVar(
+    #             delivery_index))
+    #     routing.solver().Add(
+    #         time_dimension.CumulVar(pickup_index) <=
+    #         time_dimension.CumulVar(delivery_index))
 
     # for request in data['pickups_deliveries']:
     #     pickup_index = manager.NodeToIndex(request[0])
@@ -313,34 +321,41 @@ def runOrTools(e,s,t,u,r,w,z,c,v):
     #     routing.solver().Add(routing.VehicleVar(pickup_index) == routing.VehicleVar(delivery_index))
     #     routing.solver().Add(distance_dimension.CumulVar(pickup_index) <= distance_dimension.CumulVar(delivery_index))
 
+    #==============================================================
     search_parameters = pywrapcp.DefaultRoutingSearchParameters()
     search_parameters.first_solution_strategy = (
         routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC)
-
+    search_parameters.time_limit.seconds = 30
     assignment = routing.SolveWithParameters(search_parameters)
+    #==============================================================
 
+
+    #======================================================================
     # print(assignment)
-
     # datetime object containing current date and time
     now = datetime.now()
     # dd/mm/YY H:M:S
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
-
     logging.basicConfig(filename="or-tool.log", level=logging.INFO)
-
+    timeRunningOr = 'Time running OR-tools: ' + str("%s seconds" % round((time.time() - start_or_time),2))
+    print(timeRunningOr)
+    print('\n')       
+    solverStatus = routing.status()
+    solverStatus = solver_stt(solverStatus)
+    print("Solver status:", solverStatus)
+    print('\n')       
     if assignment:
-        timeRunningOr = 'Time running OR-tools: ' + str("%s seconds" % round((time.time() - start_or_time),2))
-        print(timeRunningOr)
         logging.info((str(dt_string) + '//Type input: ' + v + ' ,Order: ' + str(num_orders) + ', Vehicles: ' + str(num_vehicles) + ',' + str(timeRunningOr)))
-        logging.info(str(data['pickups_deliveries']))
+        # logging.info(str(data['pickups_deliveries']))
         logging.info(str(data['demands']))
-        print('\n')
+        logging.info(str(solverStatus))
         print_solution(data, manager, routing, assignment)
-        print('\n')
-           
+        print('\n')       
     else:
-        timeRunningOr = 'OR-tools: No result!'
+        timeRunningOr = 'OR-tools: ' + solverStatus
         logging.info((str(dt_string) + '//Type input: ' + v + ' ,Order: ' + str(num_orders) + ', Vehicles: ' + str(num_vehicles) + ',' + str(timeRunningOr)))
+        logging.info(str(solverStatus))
+    #======================================================================
 
     # return result
 def main():

@@ -1,0 +1,84 @@
+﻿{
+  "center" : {
+    "id" : "Depot",
+    "name" : "テスト施設",
+    "address" : "京都府京都市左京区一乗寺払殿町３８",
+    "latitude" : 35.0434935,
+    "longitude" : 135.7844156
+  },
+  "vehicles" : [ {
+    "id" : "V001",
+    "name" : "1号車(シエンタ①)",
+    "workableTimeBegin" : "08:00",
+    "workableTimeEnd" : "10:00",
+    "capacities" : [ {
+      "normalSeat" : 6,
+      "wheelchairSeat" : 0,
+      "rollator" : 1
+    } , {
+      "normalSeat" : 5,
+      "wheelchairSeat" : 0,
+      "rollator" : 1
+    } , {
+      "normalSeat" : 4,
+      "wheelchairSeat" : 0,
+      "rollator" : 2
+    } ]
+  }, {
+    "id" : "V002",
+    "name" : "2号車(シエンタ②)",
+    "workableTimeBegin" : "08:00",
+    "workableTimeEnd" : "10:00",
+    "capacities" : [ {
+      "normalSeat" : 4,
+      "wheelchairSeat" : 1,
+      "rollator" : 0
+    } ]
+  }, {
+    "id" : "V003",
+    "name" : "3号車(キャラバン①)",
+    "workableTimeBegin" : "08:00",
+    "workableTimeEnd" : "10:00",
+    "capacities" : [ {
+      "normalSeat" : 8,
+      "wheelchairSeat" : 0,
+      "rollator" : 0
+     },{
+      "normalSeat" : 7,
+      "wheelchairSeat" : 1,
+      "rollator" : 0
+     } ]
+   }, {
+    "id" : "V004",
+    "name" : "4号車(キャラバン②)",
+    "workableTimeBegin" : "08:00",
+    "workableTimeEnd" : "10:00",
+   "capacities" : [ {
+      "normalSeat" : 7,
+      "wheelchairSeat" : 1,
+      "rollator" : 0
+     },{
+      "normalSeat" : 7,
+      "wheelchairSeat" : 1,
+      "rollator" : 0
+     } ]
+    }, {
+    "id" : "V005",
+    "name" : "5号車(シエンタ③)",
+    "workableTimeBegin" : "08:00",
+    "workableTimeEnd" : "10:00",
+    "capacities" : [ {
+      "normalSeat" : 6,
+      "wheelchairSeat" : 0,
+      "rollator" : 0
+    },{
+      "normalSeat" : 5,
+      "wheelchairSeat" : 0,
+      "rollator" : 1
+     },{
+      "normalSeat" : 4,
+      "wheelchairSeat" : 0,
+      "rollator" : 2
+     } ]
+  } ]
+}

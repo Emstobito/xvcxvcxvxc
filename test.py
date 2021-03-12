@@ -10,22 +10,22 @@ from datetime import datetime
 
 # limit time function
 # =========================================================
-import signal
-from contextlib import contextmanager
+# import signal
+# from contextlib import contextmanager
 
 
-class TimeoutException(Exception): pass
+# class TimeoutException(Exception): pass
 
-@contextmanager
-def time_limit(seconds):
-    def signal_handler(signum, frame):
-        raise TimeoutException("Timed out!")
-    signal.signal(signal.SIGALRM, signal_handler)
-    signal.alarm(seconds)
-    try:
-        yield
-    finally:
-        signal.alarm(0)
+# @contextmanager
+# def time_limit(seconds):
+#     def signal_handler(signum, frame):
+#         raise TimeoutException("Timed out!")
+#     signal.signal(signal.SIGALRM, signal_handler)
+#     signal.alarm(seconds)
+#     try:
+#         yield
+#     finally:
+#         signal.alarm(0)
 
 # =========================================================
 
@@ -33,7 +33,7 @@ def time_limit(seconds):
 # Creat Random data orders
 # --------------------------------------------------------------------
 # so don dat hang
-num_orders = 25
+num_orders = 10
 print('Order list:(' + str(num_orders) + ' orders)')
 
 # so luong phuong tien
