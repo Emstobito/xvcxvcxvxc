@@ -14,7 +14,6 @@ def getCsvData(num_orders):
     strGetApi = ''
     for x in range(1,num_orders):
         strGetApi = strGetApi + ';' +inputData[x][lngIndex] + ',' + inputData[x][latIndex]
-    print(strGetApi)
     return strGetApi
 
 def getJsonData():
