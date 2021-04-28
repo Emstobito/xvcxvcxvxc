@@ -1,0 +1,41 @@
+- docker pull mysql
+- docker pull phpmyadmin/phpmyadmin
+- docker pull ubuntu
+- docker run -p 8001:8001 -p 8002:8002 -p 8003:8003 -p 8004:8004 -p 8005:8005 -itd -v g:/kDocker:/home/share/ --name digtwin ubuntu /bin/bash
+- docker exec -it digtwin bash
+- cd home/share/democode/testFile/checkConnect/
+- apt update
+- apt-get install sudo -y
+- apt install python3.9
+- apt install python3-pip
+- apt install htop
+- module python:
+	+ python3 -m pip install requests (Xử lý kết quả trả về từ API)
+        + python3 -m pip install prettytable (Tạo bảng in kết quả trên terminal)
+- docker run --add-host host.docker.internal:host-gateway -p 3306:3306 --name mysql --network bridge -v /home/moe/mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123 -d mysql
+- docker run -p 8082:80 --name myadmin -d --link mysql:mysql --network bridge -e PMA_HOST=mysql phpmyadmin/phpmyadmin
+=============================================================================================================================================
+- python3 -m pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --trusted-host pypi.python.org mysql-connector-python
+=============================================================================================================================================
+- openssl genrsa -des3 -out server.key 1024
+- openssl req -new -key server.key -out server.csr
+- cp server.key server.key.org
+- openssl rsa -in server.key.org -out server.key
+- openssl x509 -req -days 365 -in server.csr -signkey server.key -out server.crt
+=============================================================================================================================================
+- apt-get install apache2
+- hostname -I | awk '{print $1}'
+- apt-get install ufw
+- ufw app list
+- ufw allow 'Apache'
+- apt-get install systemd
+- systemctl start apache2.service
+- service apache2.service start
+=============================================================================================================================================
+export http_proxy="http://10.77.8.70:8080"
+export https_proxy="http://10.77.8.70:8080"
+export HTTP_PROXY="http://10.77.8.70:8080"
+export HTTPS_PROXY="http://10.77.8.70:8080"
+=============================================================================================================================================
+- docker run -p 8006:8006 -p 8007:8007 -p 8008:8008 -p 8009:8009 -p 8010:8010 -itd -v g:/kDocker:/home/share/ --name digtwin1804 ubuntu:18.04 /bin/bash
+=============================================================================================================================================
