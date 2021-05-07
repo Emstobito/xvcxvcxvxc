@@ -4,11 +4,11 @@
 - docker run -p 8001:8001 -p 8002:8002 -p 8003:8003 -p 8004:8004 -p 8005:8005 -itd -v g:/kDocker:/home/share/ --name digtwin ubuntu /bin/bash
 - docker exec -it digtwin bash
 - cd home/share/democode/testFile/checkConnect/
-- apt update
-- apt-get install sudo -y
-- apt install python3.9
-- apt install python3-pip
-- apt install htop
+apt update
+apt-get install sudo -y
+apt install python3.9 -y
+apt install python3-pip -y
+apt install htop
 - module python:
 	+ python3 -m pip install requests (Xử lý kết quả trả về từ API)
         + python3 -m pip install prettytable (Tạo bảng in kết quả trên terminal)
@@ -36,6 +36,22 @@ export http_proxy="http://10.77.8.70:8080"
 export https_proxy="http://10.77.8.70:8080"
 export HTTP_PROXY="http://10.77.8.70:8080"
 export HTTPS_PROXY="http://10.77.8.70:8080"
+export http_proxy=
+export https_proxy=
+export HTTP_PROXY=
+export HTTPS_PROXY=
 =============================================================================================================================================
 - docker run -p 8006:8006 -p 8007:8007 -p 8008:8008 -p 8009:8009 -p 8010:8010 -itd -v g:/kDocker:/home/share/ --name digtwin1804 ubuntu:18.04 /bin/bash
 =============================================================================================================================================
+docker run -p 8011:8011 -p 8012:8012 -p 8013:8013 -itd -v g:/kDocker2:/home/share/ --name digtwin2 ubuntu /bin/bash
+==============================
+docker run -p 8014:8014 -p 8015:8015 -p 8016:8016 --cap-add=NET_ADMIN -itd -v g:/kDocker3:/home/share/ --name digtwin3 ubuntu /bin/bash
+
+Cần biết: đọc file csv bằng js, chọn đúng data và sắp xếp hợp lý, so sánh hai chuỗi ký tự (chuỗi A có nằm trong chuỗi B hay không), append element kèm theo attribute, truyền sự kiện cho các đối tượng được append bằng js  
+1: Đọc file csv, đẩy data màu vào 2 mảng, 1 mảng lưu mã, 1 mảng lưu mã màu với vị trí tương ứng.
+2: Lấy giá trị trong ô tìm kiếm.
+3. Tạo vòng lặp so sánh string trong ô tìm kiếm với từng vị trí trong mảng, lưu các vị trí kết quả phù hợp ra một mảng mới.
+4. Từ các vị trí đã lưu, lấy ra data từ 2 mảng ban đầu rồi vẽ ra các ô chọn màu (vẽ giống file readcsv.js)
+5. Truyền sự kiện cho các ô chọn màu mới tạo
+=============================================================================================================================================
+docker run -p 10.92.203.56:8080:8080 --network host -itd -v g:/kDocker:/home/share/ --name digtwinftp ubuntu /bin/bash

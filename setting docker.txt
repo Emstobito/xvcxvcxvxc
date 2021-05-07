@@ -1,0 +1,24 @@
+docker import fmm_container.tar fmm
+docker run -itd -p 8001:8001 -p 8002:8002 -p 8003:8003 -v E:/Docker/Fmm/:/home/share/ --name fmm_doc fmm /bin/bash
+docker exec -it fmm_doc bash
+conda activate ox
+cd home/share/web
+or-tools-stable/examples/python
+python3 python3-VRP.py
+python2 web_demo.py -c fmm_config.json
+
+docker run -itd -v E:/ortools:/home/share/ --name ortoools ubuntu:18.04 /bin/bash
+
+export http_proxy="http://10.77.8.70:8080"
+export https_proxy="http://10.77.8.70:8080"
+export HTTP_PROXY="http://10.77.8.70:8080"
+export HTTPS_PROXY="http://10.77.8.70:8080"
+
+docker pull mysql
+docker run --name demo_sql -e MYSQL_ROOT_PASSWORD=123456 -d mysql:latest
+docker run -it --network demo_network --rm mysql mysql -hsome-mysql root -p
+docker run -it --rm mysql mysql -hsome.mysql.host -usome-mysql-user -p
+docker run -it --network bridge --rm mysql mysql -hsome-mysql -u root -p
+
+docker run --rm --add-host host.docker.internal:host-gateway -p 3306:3306 --name mysql --network bridge -v /home/moe/mysql_data:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=123 -d mysql:5.7
+docker run -p 8082:80 --name myadmin -d --link mysql:mysql --network bridge -e PMA_HOST=mysql phpmyadmin/phpmyadmin
